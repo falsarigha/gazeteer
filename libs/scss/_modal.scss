@@ -1,0 +1,104 @@
+.modal-header {
+  table {
+    .title {
+      font-size: 1.25rem;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .countryFlag {
+      border: 1px solid black;
+      max-width: 200px;
+    }
+  }
+}
+
+.modal-body {
+  max-height: 60vh;
+  overflow-y: auto;
+
+  table {
+    width: 100%;
+
+    .left {
+      font-weight: bold;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .highLow {
+      width: 2rem;
+    }
+
+    .minMax {
+      width: auto;
+      margin: 0;
+      border-right: 1px solid black;
+    }
+
+    tr {
+      width: 100%;
+    }
+
+    td {
+      padding: 0.75rem;
+    }
+
+    .space {
+      padding-top: 1rem;
+    }
+
+    td.firstNewsDescription,
+    td.secondNewsDescription,
+    td.thirdNewsDescription,
+    td.fourthNewsDescription {
+      padding-bottom: 1rem;
+    }
+  }
+
+  .card {
+    margin: 2rem;
+
+    .btn {
+      color: #60b0f4;
+      background-color: transparent;
+      border: 1px solid #60b0f4;
+    }
+
+    .btn:hover {
+      color: white;
+      background-color: #60b0f4;
+      border: 1px solid #60b0f4;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.modal-footer {
+  .btn {
+    color: #d93838;
+    background-color: transparent;
+    border: 1px solid #d93838;
+  }
+
+  .btn:hover {
+    color: white;
+    background-color: #d93838;
+    border: 1px solid #d93838;
+  }
+}
