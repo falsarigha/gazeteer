@@ -27,7 +27,7 @@ $(document).ready(() => {
     mymap.panTo([userLat, userLng]);
 
     $.ajax({
-      url: "libs/php/userCountryInfo.php",
+      url: "libs/php/Info.php",
       type: "POST",
       dataType: "json",
       data: {
