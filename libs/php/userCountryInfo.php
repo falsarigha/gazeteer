@@ -6,8 +6,8 @@
     $executionStartTime = microtime(true);
 
     //OpenCage Routine
-    $oc_url='https://api.opencagedata.com/geocode/v1/json?q=' . $_REQUEST['lat'] . '+' . $_REQUEST['lng'] . '&key=c10468007be7424bb69d013e20efe738';
-
+    $oc_url='https://api.opencagedata.com/geocode/v1/json?q=' . $_REQUEST['lat'] . '+' . $_REQUEST['lng'] . '&key=5df3b1b2e1e445c5b3324e85c816cbd0';
+    //$oc_url = 'https://api.opencagedata.com/geocode/v1/json?q=51.5072+0.1276&key=5df3b1b2e1e445c5b3324e85c816cbd0';
     $oc_ch = curl_init();
     curl_setopt($oc_ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($oc_ch, CURLOPT_RETURNTRANSFER, true);
@@ -20,30 +20,9 @@
     $oc_decode = json_decode($oc_result,true);
     $openCage = null;
     $openCage['code'] = $oc_decode['results'][0]['components']['ISO_3166-1_alpha-3'];
-    if (!isset($oc_decode['results'][0]['annotations']['currency'])) {
-        $openCage['smallDenom'] = "N/A";
-        $openCage['subunit'] = "N/A";
-        $openCage['subToUnit'] = "N/A";
-        $openCage['driveOn'] = $oc_decode['results'][0]['annotations']['roadinfo']['drive_on'];
-        $openCage['speedIn'] = $oc_decode['results'][0]['annotations']['roadinfo']['speed_in'];
-    } else {
-        if (!isset($oc_decode['results'][0]['annotations']['currency']['smallest_denomination'])) {
-            $openCage['smallDenom'] = " ";
-        } else {
-            $openCage['subToUnit'] = $oc_decode['results'][0]['annotations']['currency']['subunit_to_unit'];
-            $openCage['driveOn'] = $oc_decode['results'][0]['annotations']['roadinfo']['drive_on'];
-            $openCage['speedIn'] = $oc_decode['results'][0]['annotations']['roadinfo']['speed_in'];
-            if (!isset($oc_decode['results'][0]['annotations']['currency']['subunit'])) {
-                $openCage['subunit'] = "N/A";
-            } else {
-                $openCage['subunit'] = $oc_decode['results'][0]['annotations']['currency']['subunit'];
-            }
-        }
-    }
-
-    // RESTCountries Routine
-    $rc_url='https://restcountries.eu/rest/v2/alpha/' . $openCage['code'];
-
+    // OpenCage API
+    
+    $rc_url='https://api.opencagedata.com/geocode/v1/json?q=' . $_REQUEST['lat'] . '+' . $_REQUEST['lng'] . '&key=5df3b1b2e1e445c5b3324e85c816cbd0';
 	$rc_ch = curl_init();
     curl_setopt($rc_ch, CURLOPT_SSL_VERIFYPEER, false);
 	curl_setopt($rc_ch, CURLOPT_RETURNTRANSFER, true);
@@ -54,26 +33,18 @@
 	curl_close($rc_ch);
 
     $rc_decode = json_decode($rc_result,true);
-    $rest_countries = null;
-    $rest_countries['iso2'] = $rc_decode['alpha2Code'];
-    $rest_countries['capital'] = $rc_decode['capital'];
-    $rest_countries['region'] = $rc_decode['region'];
-    $rest_countries['subregion'] = $rc_decode['subregion'];
-    $rest_countries['lat'] = $rc_decode['latlng'][0];
-    $rest_countries['lng'] = $rc_decode['latlng'][1];
-    $rest_countries['population'] = $rc_decode['population'];
-    $rest_countries['demonym'] = $rc_decode['demonym'];
-    $rest_countries['area'] = $rc_decode['area'];
-    $rest_countries['callCode'] = $rc_decode['callingCodes'][0];
-    $rest_countries['timezone'] = $rc_decode['timezones'][0];
-    $rest_countries['currency'] = $rc_decode['currencies'][0];
-    $rest_countries['flag'] = $rc_decode['flag'];
-    $rest_countries['webDomain'] = $rc_decode['topLevelDomain'][0];
-
+    $open_Cage = null;
+    
+    $open_Cage['iso2'] = $rc_decode['results'][0]['components']['ISO_3166-1_alpha-2'];
+    $open_Cage['lat'] = $rc_decode['results'][0]['geometry']['lat'];
+    $open_Cage['lng'] = $rc_decode['results'][0]['geometry']['lng'];;
+    $open_Cage['timezone'] = $rc_decode['results'][0]['annotations']['timezone']['name'];
+    $open_Cage['currency'] = $rc_decode['results'][0]['annotations']['currency']['name'];
+    $open_Cage['flag'] = $rc_decode['results'][0]['annotations']['flag'];
+    
     //OpenWeather Routine
-    $ow_api_key = 'cdab949d45e6ad36e58acb23d320ef18';
-
-    $ow_url='https://api.openweathermap.org/data/2.5/weather?lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&units=metric&appid=' . $ow_api_key;
+   
+    $ow_url='https://api.openweathermap.org/data/2.5/weather?lat=' . $_REQUEST['lat'] . '&lon=' . $_REQUEST['lng'] . '&units=metric&appid=e1c3308c9a1b6fff63552f064569a9a8';
 
     $ow_ch = curl_init();
     curl_setopt($ow_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -97,28 +68,8 @@
     $open_weather['windSpeed'] = $ow_decode['wind']['speed'];
     $open_weather['clouds'] = $ow_decode['clouds']['all'];
 
-    //Exchange Rates Routine
-    $er_url='https://v6.exchangerate-api.com/v6/0e25348ef7f09a5b28274858/latest/' . $rest_countries['currency']['code'];
-
-    $er_ch = curl_init();
-    curl_setopt($er_ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($er_ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($er_ch, CURLOPT_URL, $er_url);
-
-    $er_result = curl_exec($er_ch);
-
-    curl_close($er_ch);
-
-    $er_decode = json_decode($er_result,true);
-    $exchange_rates = null;
-    if ($er_decode['result'] == "error") {
-        $exchange_rates = "N/A";
-    } else {
-    $exchange_rates['rate'] = $er_decode['conversion_rates']['GBP'];
-    }
-
-    //GeoNames Country Info Routine
-    $gn_url='http://api.geonames.org/countryInfoJSON?country=' . $rest_countries['iso2'] . '&maxRows=3&username=samw93';
+    //GeoNamesCountryInfo API
+    $gn_url='http://api.geonames.org/countryInfoJSON?country=' . $open_Cage['iso2'] . '&maxRows=3&username=falsarigha';
 
     $gn_ch = curl_init();
     curl_setopt($gn_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -131,6 +82,12 @@
 
     $gn_decode = json_decode($gn_result,true);
     $geonames_info = null;
+    
+    $geonames_info['regions'] = $gn_decode['geonames'][0]['continentName'];
+    $geonames_info['area'] = $gn_decode['geonames'][0]['areaInSqKm'];
+    $geonames_info['population'] = $gn_decode['geonames'][0]['population'];
+    $geonames_info['capital'] = $gn_decode['geonames'][0]['capital'];
+
     if ($gn_decode['geonames'][0]['countryName'] == "DR Congo") {
         $geonames_info['name'] = "Democratic Republic of the Congo";
         $geonames_info['north'] = $gn_decode['geonames'][0]['north'];
@@ -145,8 +102,8 @@
         $geonames_info['west'] = $gn_decode['geonames'][0]['west'];
      }
     
-    // GeoNames Wiki Routine
-    $gnw_url='http://api.geonames.org/wikipediaBoundingBoxJSON?north=' . $geonames_info['north'] . '&south=' . $geonames_info['south'] . '&east=' . $geonames_info['east'] . '&west=' . $geonames_info['west'] . '&maxRows=50&username=samw93';
+    // GeoNamesWiki API
+    $gnw_url='http://api.geonames.org/wikipediaBoundingBoxJSON?north=' . $geonames_info['north'] . '&south=' . $geonames_info['south'] . '&east=' . $geonames_info['east'] . '&west=' . $geonames_info['west'] . '&maxRows=50&username=falsarigha';
 
     $gnw_ch = curl_init();
     curl_setopt($gnw_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -159,25 +116,17 @@
 
     $gnw_decode = json_decode($gnw_result,true);
     $geonames_wiki = [];
-    if (isset($gnw_decode['geonames'])) {
-        foreach($gnw_decode['geonames'] as $obj) {
-            if ($obj['title'] == $geonames_info['name'] || (str_contains($obj['title'], $geonames_info['name']) && (isset($obj['countryCode']) == $rest_countries['iso2'] || str_contains($obj['summary'], $geonames_info['name'])))) {
-                $wiki = null;
-                $wiki['title'] = $obj['title'];
-                $wiki['wikiUrl'] = $obj['wikipediaUrl'];
-                $wiki['wikiSummary'] = $obj['summary'];
-                $geonames_wiki[] = [$wiki['title'], $wiki['wikiUrl'], $wiki['wikiSummary']];
-            } else {
-                $geonames_wiki = null;
-            }
-            
-        }
-    } else {
-        $geonames_wiki = null;
+    
+    foreach($gnw_decode['geonames'] as $obj)
+    {
+        $geonames_wiki['title'] = $obj['title'];
+        $geonames_wiki['wikiSummary'] = $obj['summary'];
+        $geonames_wiki['wikiUrl'] = $obj['wikipediaUrl'];
+
     }
 
-    // GeoNames Cities Routine
-    $gnc_url='http://api.geonames.org/citiesJSON?north=' . $geonames_info['north'] . '&south=' . $geonames_info['south'] . '&east=' . $geonames_info['east'] . '&west=' . $geonames_info['west'] . '&lang=en&maxRows=20&username=samw93';
+    // GeoNamesCities API
+    $gnc_url='http://api.geonames.org/citiesJSON?north=' . $geonames_info['north'] . '&south=' . $geonames_info['south'] . '&east=' . $geonames_info['east'] . '&west=' . $geonames_info['west'] . '&lang=en&maxRows=20&username=falsarigha';
 
     $gnc_ch = curl_init();
     curl_setopt($gnc_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -192,7 +141,7 @@
     $geonames_cities = [];
     if (isset($gnc_decode['geonames']) || is_array($gnc_decode['geonames']) || is_object($gnc_decode['geonames'])) {
         foreach($gnc_decode['geonames'] as $obj) {
-            if ($obj['countrycode'] == $rest_countries['iso2']) {
+            if ($obj['countrycode'] == $open_Cage['iso2']) {
                 $city = null;
                 $city['name'] = $obj['name'];
                 $city['population'] = $obj['population'];
@@ -207,8 +156,8 @@
         $geonames_cities = null;
     }
 
-    //Timezone Routine
-    $tz_url='https://timezone.abstractapi.com/v1/current_time?api_key=10f6a0ab29b841cca8ada144c04e152d&location=' . $rest_countries['capital'] . ',' . $geonames_info['name'];
+    //Timezone API
+    $tz_url= 'http://api.geonames.org/timezoneJSON?lat=' .$open_Cage['lat'] . '&lng=' .$open_Cage['lng'] . '&username=falsarigha';
 
     $tz_ch = curl_init();
     curl_setopt($tz_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -221,14 +170,11 @@
 
     $tz_decode = json_decode($tz_result,true);
     $timezone = null;
-    if (!isset($tz_decode['datetime'])) {
-        $timezone['datetime'] = null;
-    } else {
-        $timezone['datetime'] = $tz_decode['datetime'];
-    }
+    
+    $timezone['time'] = $tz_decode['time'];
 
-    //News Routine
-    $news_url='https://newsapi.org/v2/top-headlines?country=' . $rest_countries['iso2'] . '&apiKey=28a6da9206f946b78fe57038813fd730';
+    //News API
+    $news_url='https://newsapi.org/v2/top-headlines?country=' . $open_Cage['iso2'] . '&apiKey=fc97ffca4a3f4fdfa287d243c795702a';
 
     $news_ch = curl_init();
     curl_setopt($news_ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -276,42 +222,13 @@
         $news['fifthSource'] = $news_decode['articles'][4]['source']['name'];
     }
 
-    //COVID-19 Routine
-    $covid_ch = curl_init();
-
-    curl_setopt_array($covid_ch, [
-        CURLOPT_URL => "https://covid-19-data.p.rapidapi.com/country/code?code=" . $rest_countries['iso2'],
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_ENCODING => "",
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => "GET",
-        CURLOPT_HTTPHEADER => [
-            "x-rapidapi-host: covid-19-data.p.rapidapi.com",
-            "x-rapidapi-key: ee24dd5034msh9a2e078a6db28fdp1778c5jsn1d27ffeeae70"
-        ],
-    ]);
-
-    $covid_result = curl_exec($covid_ch);
-
-    curl_close($covid_ch);
-
-    $covid_decode = json_decode($covid_result,true);
-    $covid = null;
-    $covid['confirmed'] = $covid_decode[0]['confirmed'];
-    $covid['recovered'] = $covid_decode[0]['recovered'];
-    $covid['critical'] = $covid_decode[0]['critical'];
-    $covid['deaths'] = $covid_decode[0]['deaths'];
-
-    // Get Country Border
+    // GetCountryBorder
     $geoJSON = json_decode(file_get_contents("../json/countryBorders.geo.json"), true);
     $geoJsonCountries = $geoJSON['features'];
     $countryBorder = null;
 
     foreach($geoJsonCountries as $country){
-        if($country['properties']['iso_a2'] == $rest_countries['iso2']){
+        if($country['properties']['iso_a2'] == $open_Cage['iso2']){
             $countryBorder = $country['geometry'];
         break;
         }
@@ -322,17 +239,18 @@
     $output['status']['name'] = "ok";
     $output['status']['description'] = "success";
     $output['status']['returnedIn'] = (microtime(true) - $executionStartTime) / 1000 . " ms";
-    $output['restCountries'] = $rest_countries;
+    $output['openCage'] = $open_Cage;
     $output['openWeather'] = $open_weather;
-    $output['exchangeRates'] = $exchange_rates;
     $output['geoNames']['info'] = $geonames_info;
     $output['geoNames']['wiki'] = $geonames_wiki;
     $output['geoNames']['cities'] = $geonames_cities;
-    $output['openCage'] = $openCage;
-    $output['timezone'] = $timezone;
+    $output['openCage'] = $open_Cage;
+    // $output['timezone'] = $timezone;
     $output['news'] = $news;
-    $output['covid'] = $covid;
+    // $output['covid'] = $covid;
     $output['border'] = $countryBorder;
+    $output['timezone'] = $timezone;
+    
     
     header("Content-Type: application/json; charset=UTF-8");
 

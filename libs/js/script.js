@@ -1,5 +1,4 @@
 var border;
-// var issLocation;
 var userLat;
 var userLng;
 var userMarker;
@@ -7,6 +6,7 @@ var cityMarker;
 var cities = L.featureGroup();
 var singleCity;
 var startTracking;
+var iso2 = null;
 
 // Display loader until page is ready
 $(window).on("load", function () {
@@ -39,79 +39,39 @@ $(document).ready(() => {
 
         if (result.status.name == "ok") {
           // Country Info
-          $(".countryFlag").attr("src", result["restCountries"]["flag"]);
-          $(".countryFlag").attr(
-            "alt",
-            result["geoNames"]["info"]["name"] + " flag"
-          );
+          $(".countryFlag").html(result["flag"]);
           $(".countryName").html(result["geoNames"]["info"]["name"]);
-          $(".region").html(
-            result["restCountries"]["region"] +
-              ", " +
-              result["restCountries"]["subregion"]
-          );
-          $(".area").html(
-            Number(result["restCountries"]["area"]).toLocaleString("en") +
-              " km<sup>2</sup>"
-          );
-          $(".population").html(
-            Number(result["restCountries"]["population"]).toLocaleString("en")
-          );
-          $(".demonym").html(result["restCountries"]["demonym"]);
-          $(".capital").html(result["restCountries"]["capital"]);
-          $(".timezone").html(result["restCountries"]["timezone"]);
-          if (result["timezone"]["datetime"] == null) {
+          $(".region").html(result['geoNames']["info"]['regions']);
+          $(".area").html(result['geoNames']["info"]['area'] + " km<sup>2</sup>");
+          $(".population").html(result['geoNames']["info"]["population"]);
+          $(".capital").html(result['geoNames']["info"]["capital"]);
+          $(".timezone").html(result["openCage"]["timezone"]);
+          $(".datetime").html(result["timezone"]['time']);
+  
+          if (result["timezone"]['time'] == null) {
             $(".datetime").html("Unable to retrieve local date & time.");
           } else {
-            $(".datetime").html(result["timezone"]["datetime"]);
+            $(".datetime").html(result["timezone"]['time']);
           }
           $(".coordinates").html(
-            result["restCountries"]["lat"] +
+            result["openCage"]["lat"] +
               " / " +
-              result["restCountries"]["lng"]
+              result["openCage"]["lng"]
           );
-          $(".callCode").html("+" + result["restCountries"]["callCode"]);
-          $(".driveOn").html("The " + result["openCage"]["driveOn"]);
-          $(".speedIn").html(result["openCage"]["speedIn"].toUpperCase());
-          $(".webDomain").html(result["restCountries"]["webDomain"]);
+          
           if (
             result["geoNames"]["wiki"] == null ||
-            result["geoNames"]["wiki"] == undefined
+            typeof result["geoNames"]["wiki"] == "undefined"
           ) {
             $(".wikiSummary").html("");
             $(".wikiUrl").attr("href", "");
             $(".wikiTitle").html("Unable to retrieve");
           } else {
-            $(".wikiSummary").html(
-              result["geoNames"]["wiki"][0]["wikiSummary"]
-            );
-            $(".wikiUrl").attr(
-              "href",
-              result["geoNames"]["wiki"][0]["wikiUrl"]
-            );
-            $(".wikiTitle").html(result["geoNames"]["wiki"][0]["title"]);
+            $(".wikiSummary").html(result["geoNames"]["wiki"]["wikiSummary"]);
+            $(".wikiUrl").attr("href", result["geoNames"]["wiki"]["wikiUrl"]);
+            $(".wikiTitle").html(result["geoNames"]["wiki"]["title"]);
           }
-
-          // Currency Info
-          $(".currencyName").html(result["restCountries"]["currency"]["name"]);
-          $(".subunit").html(result["openCage"]["subunit"]);
-          $(".smallDenom").html(result["openCage"]["smallDenom"]);
-          $(".subToUnit").html(result["openCage"]["subToUnit"]);
-          $(".currencySymbol").html(
-            result["restCountries"]["currency"]["symbol"]
-          );
-          $(".currencyCode").html(result["restCountries"]["currency"]["code"]);
-          $(".exchangeRate").html();
-          if (result.exchangeRates != "N/A") {
-            $(".exchangeRate").html(
-              `1 ${result["restCountries"]["currency"]["name"]} = ${result["exchangeRates"]["rate"]} British pound`
-            );
-          } else {
-            $(".exchangeRate").html(
-              "No exchange rate information available at this time"
-            );
-          }
-
+          
           // Weather Info
           $(".userLocation").html("your area");
           $(".weatherIcon").attr("src", result["openWeather"]["icon"]);
@@ -204,27 +164,13 @@ $(document).ready(() => {
             $(".fifthNewsSource").html(result["news"]["fifthSource"]);
           }
 
-          // COVID-19 Info
-          $(".confirmed").html(
-            Number(result["covid"]["confirmed"]).toLocaleString("en")
-          );
-          $(".recovered").html(
-            Number(result["covid"]["recovered"]).toLocaleString("en")
-          );
-          $(".deaths").html(
-            Number(result["covid"]["deaths"]).toLocaleString("en")
-          );
-          $(".critical").html(
-            Number(result["covid"]["critical"]).toLocaleString("en")
-          );
-
           if (mymap.hasLayer(border)) {
             mymap.removeLayer(border);
           }
 
           border = L.geoJSON(result["border"], {
             style: function (feature) {
-              return { color: "#D93838" };
+              return { color: "#7fcdbb" };
             },
           }).addTo(mymap);
           mymap.fitBounds(border.getBounds());
@@ -254,7 +200,7 @@ $(document).ready(() => {
         }
       },
       error: function (request, status, error) {
-        console.log(error);
+        console.log(error, status, request);
         $("#loader-container").hide();
         $("#loader").hide();
       },
@@ -274,121 +220,36 @@ $(document).ready(() => {
   });
 });
 
-// Map tiles & Overlays
-var Esri_WorldImagery = L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-    attribution:
-      "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
-  }
-);
-var OpenStreetMap_Mapnik = L.tileLayer(
-  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+// Map layer
+
+var OpenStreetMap_Mapnik = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
     maxZoom: 19,
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }
-);
-var Stadia_AlidadeSmoothDark = L.tileLayer(
-  "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
-  {
-    maxZoom: 20,
-    attribution:
-      '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-  }
-);
-var Stadia_Outdoors = L.tileLayer(
-  "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",
-  {
-    maxZoom: 20,
-    attribution:
-      '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
-  }
-);
-var Stamen_Watercolor = L.tileLayer(
-  "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}",
-  {
-    attribution:
-      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: "abcd",
-    minZoom: 1,
-    maxZoom: 16,
-    ext: "jpg",
-  }
-);
-var OpenRailwayMap = L.tileLayer(
-  "https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution:
-      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-  }
-);
-var Stamen_TonerHybrid = L.tileLayer(
-  "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-hybrid/{z}/{x}/{y}{r}.{ext}",
-  {
-    attribution:
-      'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: "abcd",
-    minZoom: 0,
-    maxZoom: 20,
-    ext: "png",
-  }
-);
-var WaymarkedTrails_hiking = L.tileLayer(
-  "https://tile.waymarkedtrails.org/hiking/{z}/{x}/{y}.png",
-  {
-    maxZoom: 18,
-    attribution:
-      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-  }
-);
-var WaymarkedTrails_cycling = L.tileLayer(
-  "https://tile.waymarkedtrails.org/cycling/{z}/{x}/{y}.png",
-  {
-    maxZoom: 18,
-    attribution:
-      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://waymarkedtrails.org">waymarkedtrails.org</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
-  }
-);
-var Thunderforest_MobileAtlas = L.tileLayer(
-  "https://{s}.tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey={apikey}",
-  {
-    attribution:
-      '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    apikey: "3bfafd83922741d79a4c36f18e1bdfe8",
-    maxZoom: 22,
-  }
-);
+  });
 
-var Jawg_Streets = L.tileLayer(
-  "https://{s}.tile.jawg.io/jawg-streets/{z}/{x}/{y}{r}.png?access-token={accessToken}",
-  {
-    attribution:
-      '<a href="http://jawg.io" title="Tiles Courtesy of Jawg Maps" target="_blank">&copy; <b>Jawg</b>Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    minZoom: 0,
-    maxZoom: 22,
-    subdomains: "abcd",
-    accessToken:
-      "35K3OEa1eVgfR0CPWGqsYVFMHuwPDEbyiDg9m7bj9WBpuLhjJJuHfdpKvCtYpcn4",
-  }
-);
+var OPNVKarte = L.tileLayer('https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png', 
+{
+	maxZoom: 119,
+	attribution: 'Map <a href="https://memomaps.de/">memomaps.de</a> <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+});
 
-// var issIcon = L.icon({
-//   iconUrl: "./img/iss.png",
-//   iconSize: [100, 50],
-//   iconAnchor: [50, 25],
-// });
+var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+ {
+	maxZoom: 17,
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+});
 
+// Icon
 var userIcon = L.icon({
-  iconUrl: "./img/user-marker.png",
+  iconUrl: "./img/map-markers.png",
   iconSize: [50, 50],
   iconAnchor: [25, 25],
 });
 
 var cityIcon = L.icon({
-  iconUrl: "./img/city-marker.png",
+  iconUrl: "./img/location.png",
   iconSize: [50, 50],
   iconAnchor: [25, 25],
 });
@@ -402,18 +263,17 @@ var mymap = L.map("mapid", {
 
 var baseMaps = {
   "Streets Map": OpenStreetMap_Mapnik,
-  Sunny: Jawg_Streets,
-  Dark: Stadia_AlidadeSmoothDark,
-  "Mobile Atlas": Thunderforest_MobileAtlas,
-  "World Imagery": Esri_WorldImagery,
-  Watercolor: Stamen_Watercolor,
+  "Topographic Map ": OpenTopoMap,
+  "Aereoport Map": OPNVKarte
+  
 };
 
 var mapOverlays = {
-  "World Imagery Overlay": Stamen_TonerHybrid,
-  "Railways Overlay": OpenRailwayMap,
-  "Hiking Trails": WaymarkedTrails_hiking,
-  "Cycling Trails": WaymarkedTrails_cycling,
+  
+  // "World Imagery Overlay": Stamen_TonerHybrid,
+  // "Railways Overlay": OpenRailwayMap,
+  // "Hiking Trails": WaymarkedTrails_hiking,
+  // "Cycling Trails": WaymarkedTrails_cycling,
 };
 
 L.control.layers(baseMaps, mapOverlays).addTo(mymap);
@@ -428,11 +288,11 @@ L.easyButton(
 ).addTo(mymap);
 
 L.easyButton(
-  "<i class='fas fa-pound-sign'></i>",
+  "<i class='fab fa-wikipedia-w'></i>",
   function () {
-    $("#currencyInfo").modal("toggle");
+    $("#wikiInfo").modal("toggle");
   },
-  "Currency Information"
+  "Wikipedia Information"
 ).addTo(mymap);
 
 L.easyButton(
@@ -451,85 +311,20 @@ L.easyButton(
   "Latest News"
 ).addTo(mymap);
 
-L.easyButton(
-  "<i class='fas fa-virus'></i>",
-  function () {
-    $("#covid19").modal("toggle");
-  },
-  "COVID-19 Information"
-).addTo(mymap);
-
-// function trackISS() {
-//   $.ajax({
-//     url: "libs/php/findISS.php",
-//     type: "POST",
-//     dataType: "json",
-//     success: function (result) {
-//       if (issLocation) {
-//         mymap.removeLayer(issLocation);
-//       }
-
-//       issLocation = L.marker([result.iss.lat, result.iss.lng], {
-//         icon: issIcon,
-//       })
-//         .bindPopup("Current location of the International Space Station.")
-//         .addTo(mymap);
-
-//       mymap.panTo([result.iss.lat, result.iss.lng], {
-//         animate: true,
-//       });
-//     },
-//     error: function (request, status, error) {
-//       console.log(error);
-//     },
-//   });
-// }
-
-// L.easyButton({
-//   id: "startISS",
-//   position: "topleft",
-//   states: [
-//     {
-//       stateName: "start-tracking",
-//       onClick: function (button, mymap) {
-//         trackISS();
-//         startTracking = setInterval(trackISS, 5000);
-//       },
-//       title: "Track ISS",
-//       icon: "fa-satellite",
-//     },
-//   ],
-// }).addTo(mymap);
-
-// L.easyButton({
-//   id: "stopISS",
-//   position: "topleft",
-//   states: [
-//     {
-//       stateName: "stop-tracking",
-//       onClick: function (button, mymap) {
-//         clearInterval(startTracking);
-//         mymap.removeLayer(issLocation);
-//         mymap.fitBounds(border.getBounds());
-//       },
-//       title: "Stop Tracking ISS",
-//       icon: "fa-stop",
-//     },
-//   ],
-// }).addTo(mymap);
-
 // Populate select field
 $.ajax({
   url: "libs/php/populateSelect.php",
   type: "POST",
   dataType: "json",
   success: function (result) {
+
     $.each(result.data, function (index) {
       $("#selectCountry").append(
         $("<option>", {
           value: result.data[index].iso3,
           text: result.data[index].name,
-        })
+          
+        }),
       );
     });
   },
@@ -559,7 +354,7 @@ $("#selectCountry").change(function () {
 
       border = L.geoJSON(result["border"], {
         style: function (feature) {
-          return { color: "#D93838" };
+          return { color: "#7fcdbb" };
         },
       }).addTo(mymap);
       mymap.fitBounds(border.getBounds());
@@ -574,11 +369,11 @@ $("#selectCountry").change(function () {
     type: "POST",
     dataType: "json",
     data: {
-      code: $("#selectCountry").val(),
+      code: $(this).find('option:selected').text()
     },
     success: function (result) {
       console.log(result);
-
+       
       if (result.status.name == "ok") {
         if (mymap.hasLayer(singleCity)) {
           mymap.removeLayer(singleCity);
@@ -608,7 +403,7 @@ $("#selectCountry").change(function () {
           });
         } else {
           singleCity = L.marker(
-            [result["restCountries"]["lat"], result["restCountries"]["lng"]],
+            [result["openCage"]["lat"], result["openCage"]["lng"]],
             {
               icon: cityIcon,
             }
@@ -617,41 +412,26 @@ $("#selectCountry").change(function () {
         }
 
         // Country Info
-        $(".countryFlag").attr("src", result["restCountries"]["flag"]);
-        $(".countryFlag").attr(
-          "alt",
-          result["geoNames"]["info"]["name"] + " flag"
-        );
+        $(".countryFlag").html(result["flag"]);
         $(".countryName").html(result["geoNames"]["info"]["name"]);
-        $(".region").html(
-          result["restCountries"]["region"] +
-            ", " +
-            result["restCountries"]["subregion"]
-        );
-        $(".area").html(
-          Number(result["restCountries"]["area"]).toLocaleString("en") +
-            " km<sup>2</sup>"
-        );
-        $(".population").html(
-          Number(result["restCountries"]["population"]).toLocaleString("en")
-        );
-        $(".demonym").html(result["restCountries"]["demonym"]);
-        $(".capital").html(result["restCountries"]["capital"]);
-        $(".timezone").html(result["restCountries"]["timezone"]);
-        if (result["timezone"]["datetime"] == null) {
+        $(".region").html(result['geoNames']["info"]['regions']);
+        $(".area").html(result['geoNames']["info"]['area'] + " km<sup>2</sup>");
+        $(".population").html(result['geoNames']["info"]["population"]);
+        $(".capital").html(result['geoNames']["info"]["capital"]);
+        $(".timezone").html(result["openCage"]["timezone"]);
+        $(".datetime").html(result["timezone"]['time']);
+
+        if (result["timezone"]['time'] == null) {
           $(".datetime").html("Unable to retrieve local date & time.");
         } else {
-          $(".datetime").html(result["timezone"]["datetime"]);
+          $(".datetime").html(result["timezone"]['time']);
         }
         $(".coordinates").html(
-          result["restCountries"]["lat"] +
+          result["openCage"]["lat"] +
             " / " +
-            result["restCountries"]["lng"]
+            result["openCage"]["lng"]
         );
-        $(".callCode").html("+" + result["restCountries"]["callCode"]);
-        $(".driveOn").html("The " + result["openCage"]["driveOn"]);
-        $(".speedIn").html(result["openCage"]["speedIn"]);
-        $(".webDomain").html(result["restCountries"]["webDomain"]);
+        
         if (
           result["geoNames"]["wiki"] == null ||
           typeof result["geoNames"]["wiki"] == "undefined"
@@ -660,29 +440,9 @@ $("#selectCountry").change(function () {
           $(".wikiUrl").attr("href", "");
           $(".wikiTitle").html("Unable to retrieve");
         } else {
-          $(".wikiSummary").html(result["geoNames"]["wiki"][0]["wikiSummary"]);
-          $(".wikiUrl").attr("href", result["geoNames"]["wiki"][0]["wikiUrl"]);
-          $(".wikiTitle").html(result["geoNames"]["wiki"][0]["title"]);
-        }
-
-        // Currency Info
-        $(".currencyName").html(result["restCountries"]["currency"]["name"]);
-        $(".subunit").html(result["openCage"]["subunit"]);
-        $(".smallDenom").html(result["openCage"]["smallDenom"]);
-        $(".subToUnit").html(result["openCage"]["subToUnit"]);
-        $(".currencySymbol").html(
-          result["restCountries"]["currency"]["symbol"]
-        );
-        $(".currencyCode").html(result["restCountries"]["currency"]["code"]);
-        $(".exchangeRate").html();
-        if (result.exchangeRates != "N/A") {
-          $(".exchangeRate").html(
-            `1 ${result["restCountries"]["currency"]["name"]} = ${result["exchangeRates"]["rate"]} British pound`
-          );
-        } else {
-          $(".exchangeRate").html(
-            "No exchange rate information available at this time"
-          );
+          $(".wikiSummary").html(result["geoNames"]["wiki"]["wikiSummary"]);
+          $(".wikiUrl").attr("href", result["geoNames"]["wiki"]["wikiUrl"]);
+          $(".wikiTitle").html(result["geoNames"]["wiki"]["title"]);
         }
 
         // Weather Info
@@ -772,26 +532,12 @@ $("#selectCountry").change(function () {
           $(".fifthNewsSource").html(result["news"]["fifthSource"]);
         }
 
-        // COVID-19 Info
-        $(".confirmed").html(
-          Number(result["covid"]["confirmed"]).toLocaleString("en")
-        );
-        $(".recovered").html(
-          Number(result["covid"]["recovered"]).toLocaleString("en")
-        );
-        $(".deaths").html(
-          Number(result["covid"]["deaths"]).toLocaleString("en")
-        );
-        $(".critical").html(
-          Number(result["covid"]["critical"]).toLocaleString("en")
-        );
-
         $("#loader-container").hide();
         $("#loader").hide();
       }
     },
     error: function (request, status, error) {
-      console.log(error);
+      console.log(error,status,request);
       $("#loader-container").hide();
       $("#loader").hide();
     },

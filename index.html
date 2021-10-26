@@ -1,53 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-  <!----------------------------------------------------- HEAD SECTION --------------------------------------------------->
   <head>
-    <!-- Meta Tags -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
-      name="description"
-      content="a geografical index and Info of countries"
-    />
-    
+      name="description" content="a geografical index and Info of countries" />
     <title>Gazetteer</title>
     <meta name="author" content="Giovanni Bronamonte" />
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon" />
-
-    <!-- Leaflet CSS -->
+    <link rel="icon" href="./img/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="./vendor/leaflet/leaflet.css" />
-
-    <!-- Leaflet EasyButton CSS -->
     <link rel="stylesheet" href="./vendor/leafletEasyButton/easy-button.css" />
-
-    <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
       href="./vendor/bootstrap-5.0.0-beta3-dist/css/bootstrap.min.css"
     />
-
-    <!-- My CSS -->
     <link rel="stylesheet" href="libs/css/styles.css" />
   </head>
 
-  
   <body>
     <!-- Loader -->
     <div id="loader-container"><div id="loader"></div></div>
 
     <!-- Nav -->
-    <!-- Image and text -->
-    <nav class="navbar navbar-light bg-light d-flex justify-content-between">
-      <a class="navbar-brand" href="https://gazetteer.samwelsh.co.uk">
-        <img
-          src="./img/gazetteer-logo.png"
-          class="gazetteerLogo d-inline-block align-top"
-          alt="Gazetteer Logo"
-        />
-      </a>
-      <!-- Select -->
+     <nav class="navbar navbar-light bg-light d-flex justify-content-between">
+      <a class="navbar-brand" href="#">Gazetteer</a>
+        
       <select name="selectCountry" id="selectCountry">
         <option value="choose">Select a Country</option>
       </select>
@@ -66,16 +43,9 @@
           <div class="modal-header justify-content-center">
             <table>
               <tr>
-                <td class="center">
-                  <img src="" alt="" class="countryFlag" />
-                </td>
-              </tr>
-              <tr>
                 <td class="center title"><b class="countryName"></b></td>
               </tr>
-              <tr>
-                <td class="wikiSummary"></td>
-              </tr>
+              
             </table>
           </div>
           <div class="modal-body justify-content-center">
@@ -94,11 +64,6 @@
                 <td class="center"><i class="fas fa-users"></i></td>
                 <td class="left">Population:</td>
                 <td class="population right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-user-edit"></i></td>
-                <td class="left">Demonym:</td>
-                <td class="demonym right"></td>
               </tr>
               <tr>
                 <td class="center"><i class="fas fa-city"></i></td>
@@ -120,37 +85,6 @@
                 <td class="left">Coordinates (Lat/Lng):</td>
                 <td class="coordinates right"></td>
               </tr>
-              <tr>
-                <td class="center"><i class="fas fa-phone"></i></td>
-                <td class="left">Calling Code:</td>
-                <td class="callCode right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-road"></i></td>
-                <td class="left">Drive On:</td>
-                <td class="driveOn right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-tachometer-alt"></i></td>
-                <td class="left">Speed Measured In:</td>
-                <td class="speedIn right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-desktop"></i></td>
-                <td class="left">Web Domain:</td>
-                <td class="webDomain right"></td>
-              </tr>
-              <tr>
-                <td class="center">
-                  <i class="fab fa-wikipedia-w"></i>
-                </td>
-                <td class="left">Full Wikipedia Entry:</td>
-                <td class="right">
-                  <a href="" target="_blank" class="wikiUrl"
-                    ><span class="wikiTitle"></span
-                  ></a>
-                </td>
-              </tr>
             </table>
           </div>
           <div class="modal-footer">
@@ -166,12 +100,12 @@
       </div>
     </div>
 
-    <!-- Currency Info Modal -->
+    <!-- Wikipedia Info Modal -->
     <div
       class="modal fade"
-      id="currencyInfo"
+      id="wikiInfo"
       tabindex="-1"
-      aria-labelledby="currencyInfoLabel"
+      aria-labelledby="wikiInfoLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog modal-sm modal-lg">
@@ -179,14 +113,9 @@
           <div class="modal-header justify-content-center">
             <table>
               <tr>
-                <td class="center">
-                  <img src="" alt="" class="countryFlag" />
-                </td>
-              </tr>
-              <tr>
                 <td class="center title">
                   <b class="countryName"></b>
-                  <b class="title">- Currency Information</b>
+                  <b class="title">- Wikipedia</b>
                 </td>
               </tr>
             </table>
@@ -194,44 +123,21 @@
           <div class="modal-body">
             <table class="table table-striped">
               <tr>
-                <td class="center"><i class="fas fa-sort-alpha-down"></i></td>
-                <td class="left">Currency Name</td>
-                <td class="currencyName right"></td>
+                
+                <td class="left">Title</td>
+                <td class="wikiTitle right"></td>
               </tr>
               <tr>
-                <td class="center"><i class="far fa-money-bill-alt"></i></td>
-                <td class="left">Subunit</td>
-                <td class="subunit right"></td>
+                <tr>
+                <td colspan="2" class="wikiSummary"></td>
+              </tr>
               </tr>
               <tr>
-                <td class="center"><i class="fas fa-coins"></i></td>
-                <td class="left">Smallest Denomination</td>
+                <td class="left">Full Wikipedia Entry:</td>
                 <td class="right">
-                  <span class="smallDenom"></span> <span class="subunit"></span>
+                  <a href="" target="_blank" class="wikiUrl"
+                    ><span class="wikiTitle"></span></a>
                 </td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-equals"></i></td>
-                <td class="left">
-                  Number of <span class="subunit"></span>'s to 1
-                  <span class="currencyName"></span>
-                </td>
-                <td class="subToUnit right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-pound-sign"></i></td>
-                <td class="left">Currency Symbol</td>
-                <td class="currencySymbol right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="far fa-keyboard"></i></td>
-                <td class="left">Currency Code</td>
-                <td class="currencyCode right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-exchange-alt"></i></td>
-                <td class="left">Current Exchange Rate</td>
-                <td class="exchangeRate right"></td>
               </tr>
             </table>
           </div>
@@ -260,11 +166,6 @@
         <div class="modal-content">
           <div class="modal-header justify-content-center">
             <table>
-              <tr>
-                <td class="center">
-                  <img src="" alt="" class="countryFlag" />
-                </td>
-              </tr>
               <tr>
                 <td class="center title">
                   <b class="title">Weather in </b
@@ -350,11 +251,6 @@
         <div class="modal-content">
           <div class="modal-header justify-content-center">
             <table>
-              <tr>
-                <td class="center">
-                  <img src="" alt="" class="countryFlag" />
-                </td>
-              </tr>
               <tr>
                 <td class="center title">
                   <b class="countryName"></b><b class="title"> - Latest News</b>
@@ -445,91 +341,23 @@
         </div>
       </div>
     </div>
-
-    <!-- COVID Modal -->
-    <div
-      class="modal fade"
-      id="covid19"
-      tabindex="-1"
-      aria-labelledby="covid19Label"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-sm modal-lg">
-        <div class="modal-content">
-          <div class="modal-header justify-content-center">
-            <table>
-              <tr>
-                <td class="center">
-                  <img src="" alt="" class="countryFlag" />
-                </td>
-              </tr>
-              <tr>
-                <td class="center title">
-                  <b class="countryName"></b
-                  ><b class="title"> - COVID19 Statistics </b>
-                </td>
-              </tr>
-            </table>
-          </div>
-          <div class="modal-body">
-            <table class="table table-striped">
-              <tr>
-                <td class="center"><i class="fas fa-file-medical"></i></td>
-                <td class="left">Confirmed Cases:</td>
-                <td class="confirmed right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="far fa-heart"></i></td>
-                <td class="left">Recovered:</td>
-                <td class="recovered right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="fas fa-feather-alt"></i></td>
-                <td class="left">Deaths:</td>
-                <td class="deaths right"></td>
-              </tr>
-              <tr>
-                <td class="center"><i class="far fa-hospital"></i></td>
-                <td class="left">Critical:</td>
-                <td class="critical right"></td>
-              </tr>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Map & Select bar -->
     <div id="mapid"></div>
 
-    <!-- Leaflet JS -->
+    <div id="footer">
+      <div>Icons made by <a href="" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+    </div>
+    
     <script src="./vendor/leaflet/leaflet.js"></script>
-
-    <!-- Leaflet EasyButton JS -->
     <script src="./vendor/leafletEasyButton/easy-button.js"></script>
-
-    <!-- Font Awesome -->
     <script
       src="https://kit.fontawesome.com/9b0dfef49e.js"
       crossorigin="anonymous"
     ></script>
-
-    <!-- jQuery -->
     <script src="./vendor/jquery/jquery-3.6.0.min.js"></script>
-
-    <!-- Bootstrap JS -->
     <script src="./vendor/bootstrap-5.0.0-beta3-dist/js/bootstrap.min.js"></script>
-
-    <!-- My JS -->
     <script src="libs/js/script.js"></script>
-  </body>
+   </body>
 </html>

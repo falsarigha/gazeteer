@@ -13,6 +13,7 @@
     foreach ($countryData['features'] as $feature) {
 
          $country = null;
+         
          $country['iso3'] = $feature["properties"]['iso_a3'];
          $country['name'] = $feature["properties"]['name'];
 

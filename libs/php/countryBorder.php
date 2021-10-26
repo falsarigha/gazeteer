@@ -9,7 +9,7 @@
     $geoJSON = json_decode(file_get_contents("../json/countryBorders.geo.json"), true);
     $geoJsonCountries = $geoJSON['features'];
     $countryBorder = null;
-
+    
     foreach($geoJsonCountries as $country){
         if($country['properties']['iso_a3'] == $_REQUEST['code']){
             $countryBorder = $country['geometry'];
