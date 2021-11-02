@@ -524,6 +524,47 @@ $("#selectCountry").change(function () {
         $(".windSpeed").html(result["openWeather"]["windSpeed"] + " m/s");
         $(".pressure").html(result["openWeather"]["pressure"] + " hPa");
 
+        //forecast
+        const options = { weekday: 'long'};
+        const event = new Date(result["forecast_weather"][0] * 1000);
+        const dt = event.toLocaleDateString('en', options);
+        const event1 = new Date(result["forecast_weather"][3] * 1000);
+        const dt1 = event1.toLocaleDateString('en', options);
+        const event2 = new Date(result["forecast_weather"][6] * 1000);
+        const dt2 = event2.toLocaleDateString('en', options);
+        const event3 = new Date(result["forecast_weather"][9] * 1000);
+        const dt3 = event3.toLocaleDateString('en', options);
+        const event4 = new Date(result["forecast_weather"][12] * 1000);
+        const dt4 = event4.toLocaleDateString('en', options);
+        const event5 = new Date(result["forecast_weather"][15] * 1000);
+        const dt5 = event5.toLocaleDateString('en', options);
+        const event6 = new Date(result["forecast_weather"][18] * 1000);
+        const dt6 = event6.toLocaleDateString('en', options);
+        //console.log(event.toLocaleDateString('en', options));
+        
+        $(".dt").text(dt);
+        $(".dt1").text(dt1);
+        $(".dt2").text(dt2);
+        $(".dt3").text(dt3);
+        $(".dt4").text(dt4);
+        $(".dt5").text(dt5);
+        $(".dt6").text(dt6);
+        $(".mainFo").html(result["forecast_weather"][1]);
+        $(".mainFo1").html(result["forecast_weather"][4]);
+        $(".mainFo2").html(result["forecast_weather"][7]);
+        $(".mainFo3").html(result["forecast_weather"][10]);
+        $(".mainFo4").html(result["forecast_weather"][13]);
+        $(".mainFo5").html(result["forecast_weather"][16]);
+        $(".mainFo6").html(result["forecast_weather"][19]);
+        $(".iconForecast").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][2]}.png`);
+        $(".iconForecast1").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][5]}.png`);
+        $(".iconForecast2").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][8]}.png`);
+        $(".iconForecast3").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][11]}.png`);
+        $(".iconForecast4").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][14]}.png`);
+        $(".iconForecast5").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][17]}.png`);
+        $(".iconForecast6").attr("src",`http://openweathermap.org/img/wn/${result["forecast_weather"][20]}.png`);
+
+
         // Latest News
         if (result.news == "N/A") {
           $(".firstNewsImage").attr("src", "");

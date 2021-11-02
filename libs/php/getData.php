@@ -257,6 +257,7 @@
     $output['news'] = $news;
     $output['flag'] =$fl_decode;
     $output['timezone'] = $timezone;
+    $output['forecast_weather'] = $forecast_weather;
     
    
     
