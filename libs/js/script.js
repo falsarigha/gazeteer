@@ -20,7 +20,7 @@ $(document).ready(() => {
     userLat = position.coords.latitude;
     userLng = position.coords.longitude;
     
-
+    
     $.ajax({
       url: "libs/php/infoUserData.php",
       type: "POST",
@@ -34,8 +34,8 @@ $(document).ready(() => {
 
         if (result.status.name == "ok") {
           // Country Info
-          $(".countryFlag").html(result["flag"]);
-          $('#selectCountry').val(result["openCage"]["iso3"]).attr('selected', true).change();
+          console.log(result["geoNames"]["info"]["iso3"]);
+          $('#selectCountry').val(result["geoNames"]["info"]["iso3"]).attr('selected', true);
           $(".countryName").html(result["geoNames"]["info"]["name"]);
           $(".region").html(result['geoNames']["info"]['regions']);
           $(".area").html(result['geoNames']["info"]['area'] + " km<sup>2</sup>");
@@ -312,10 +312,12 @@ var cityIcon = L.icon({
 
 // Create map
 var mymap = L.map("mapid", {
+  attributionControl: false,
   center: [0, 0],
   zoom: 3,
   layers: [OpenStreetMap_Mapnik],
 });
+
 
 var baseMaps = {
   "Streets Map": OpenStreetMap_Mapnik,

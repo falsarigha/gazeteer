@@ -1,3 +1,8 @@
+body{
+    max-width: 100%;
+    max-height: 100%;
+    overflow: hidden;
+}
 .navbar{
     height:6vh;
     font-size:0.9rem;
@@ -160,8 +165,16 @@ html{
     font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif
 }
 
-#footer{
-    position: fixed;
+/* #footer{
+    max-height: 10px;
+    position: absolute;
     bottom: 0;
+    left: 0;
     width: 100%;
+    font-size: 0.7rem;
 }
+#footer > div {
+    margin: -10px;
+    vertical-align:middle;
+    max-height: 50%;
+}  */

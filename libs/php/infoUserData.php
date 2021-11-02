@@ -112,6 +112,7 @@
     $geonames_info = null;
     
     $geonames_info['regions'] = $gn_decode['geonames'][0]['continentName'];
+    $geonames_info['iso3'] = $gn_decode['geonames'][0]['isoAlpha3'];
     $geonames_info['area'] = $gn_decode['geonames'][0]['areaInSqKm'];
     $geonames_info['population'] = $gn_decode['geonames'][0]['population'];
     $geonames_info['capital'] = $gn_decode['geonames'][0]['capital'];
