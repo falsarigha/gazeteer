@@ -30,11 +30,11 @@ $(document).ready(() => {
         lng: userLng,
       },
       success: function (result) {
-        console.log(result);
+        //console.log(result);
 
         if (result.status.name == "ok") {
           // Country Info
-          console.log(result["geoNames"]["info"]["iso3"]);
+          //console.log(result["geoNames"]["info"]["iso3"]);
           $('#selectCountry').val(result["geoNames"]["info"]["iso3"]).attr('selected', true);
           $(".countryName").html(result["geoNames"]["info"]["name"]);
           $(".region").html(result['geoNames']["info"]['regions']);
@@ -51,7 +51,7 @@ $(document).ready(() => {
             //timeformatted
             const dateTime = new Date(result["timezone"]['time']);
             const timeFormatted = dateTime.toLocaleString('en-GB', {timeZone: 'UTC'} );
-            console.log(timeFormatted);
+            //console.log(timeFormatted);
             $(".datetime").text(timeFormatted);
           }
           $(".coordinates").html(
@@ -282,19 +282,20 @@ var OpenStreetMap_Mapnik = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{
   {
     maxZoom: 19,
     attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Icons made by <a href="" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>',
+      
   });
 
 var OPNVKarte = L.tileLayer('https://tileserver.memomaps.de/tilegen/{z}/{x}/{y}.png', 
 {
 	maxZoom: 119,
-	attribution: 'Map <a href="https://memomaps.de/">memomaps.de</a> <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	attribution: 'Map <a href="https://memomaps.de/">memomaps.de</a> <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors,Icons made by <a href="" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>'
 });
 
 var OpenTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
  {
 	maxZoom: 17,
-	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+	attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>),Icons made by <a href="" title="Good Ware">Good Ware</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>'
 });
 
 // Icon
@@ -312,7 +313,7 @@ var cityIcon = L.icon({
 
 // Create map
 var mymap = L.map("mapid", {
-  attributionControl: false,
+  attributionControl: true   ,
   center: [0, 0],
   zoom: 3,
   layers: [OpenStreetMap_Mapnik],
@@ -396,7 +397,7 @@ $("#selectCountry").change(function () {
       code: $("#selectCountry").val(),
     },
     success: function (result) {
-      console.log(result);
+      //console.log(result);
 
       if (mymap.hasLayer(border)) {
         mymap.removeLayer(border);
@@ -422,7 +423,7 @@ $("#selectCountry").change(function () {
       code: $(this).find('option:selected').text()
     },
     success: function (result) {
-      console.log(result);
+     // console.log(result);
        
       if (result.status.name == "ok") {
         if (mymap.hasLayer(singleCity)) {
@@ -478,7 +479,7 @@ $("#selectCountry").change(function () {
           //timeformatted
           const dateTime = new Date(result["timezone"]['time']);
           const timeFormatted = dateTime.toLocaleString('en-GB', {timeZone: 'UTC'} );
-          console.log(timeFormatted);
+          //console.log(timeFormatted);
           $(".datetime").text(timeFormatted);
         }
         $(".coordinates").html(
