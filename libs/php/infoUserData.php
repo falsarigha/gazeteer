@@ -285,6 +285,8 @@
     
     
     header("Content-Type: application/json; charset=UTF-8");
+    header("Content-Security-Policy: default-src 'self'"); //https
+    header('permissions-policy: interest-cohort=()'); // wiki
 
     echo json_encode($output);
 ?>

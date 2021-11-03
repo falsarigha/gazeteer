@@ -263,6 +263,7 @@
     
     header("Content-Type: application/json; charset=UTF-8");
     header('permissions-policy: interest-cohort=()');
+    header("Content-Security-Policy: default-src 'self'"); //https
 
     echo json_encode($output);
 ?>
