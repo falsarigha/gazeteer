@@ -20,7 +20,7 @@
 
     $rc_decode = json_decode($rc_result,true);
     $open_Cage = null;
-    $open_Cage['iso3'] = $rc_decode['results'][0]['components']['ISO_3166-1_alpha-3'];
+    //$open_Cage['iso3'] = $rc_decode['results'][0]['components']['ISO_3166-1_alpha-3'];
     $open_Cage['iso2'] = $rc_decode['results'][0]['components']['ISO_3166-1_alpha-2'];
     $open_Cage['lat'] = $rc_decode['results'][0]['geometry']['lat'];
     $open_Cage['lng'] = $rc_decode['results'][0]['geometry']['lng'];;
